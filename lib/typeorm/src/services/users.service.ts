@@ -1,32 +1,28 @@
 import { hash } from 'bcrypt';
 import { EntityRepository, Repository } from 'typeorm';
-import { CreateUserDto } from '@dtos/users.dto';
+import { Service } from 'typedi';
 import { UserEntity } from '@entities/users.entity';
-import { HttpException } from '@exceptions/HttpException';
+import { HttpException } from '@/exceptions/httpException';
 import { User } from '@interfaces/users.interface';
-import { isEmpty } from '@utils/util';
 
+@Service()
 @EntityRepository()
-class UserService extends Repository<UserEntity> {
+export class UserService extends Repository<UserEntity> {
   public async findAllUser(): Promise<User[]> {
     const users: User[] = await UserEntity.find();
     return users;
   }
 
   public async findUserById(userId: number): Promise<User> {
-    if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
-
     const findUser: User = await UserEntity.findOne({ where: { id: userId } });
-    if (!findUser) throw new HttpException(409, "You're not user");
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;
   }
 
-  public async createUser(userData: CreateUserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-
+  public async createUser(userData: User): Promise<User> {
     const findUser: User = await UserEntity.findOne({ where: { email: userData.email } });
-    if (findUser) throw new HttpException(409, `You're email ${userData.email} already exists`);
+    if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
     const createUserData: User = await UserEntity.create({ ...userData, password: hashedPassword }).save();
@@ -34,11 +30,9 @@ class UserService extends Repository<UserEntity> {
     return createUserData;
   }
 
-  public async updateUser(userId: number, userData: CreateUserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-
+  public async updateUser(userId: number, userData: User): Promise<User> {
     const findUser: User = await UserEntity.findOne({ where: { id: userId } });
-    if (!findUser) throw new HttpException(409, "You're not user");
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     const hashedPassword = await hash(userData.password, 10);
     await UserEntity.update(userId, { ...userData, password: hashedPassword });
@@ -48,14 +42,10 @@ class UserService extends Repository<UserEntity> {
   }
 
   public async deleteUser(userId: number): Promise<User> {
-    if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
-
     const findUser: User = await UserEntity.findOne({ where: { id: userId } });
-    if (!findUser) throw new HttpException(409, "You're not user");
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     await UserEntity.delete({ id: userId });
     return findUser;
   }
 }
-
-export default UserService;

@@ -1,6 +1,6 @@
 {
   "name": "typescript-express-starter",
-  "version": "9.1.2",
+  "version": "10.0.0",
   "description": "Quick and Easy TypeScript Express Starter",
   "author": "AGUMON <ljlm0402@gmail.com>",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "typegoose",
     "mikro-orm",
     "routing-controllers",
+    "node-postgres",
     "logger",
     "swagger",
     "jest",
@@ -36,14 +37,13 @@
     "start": "node bin/cli.js"
   },
   "dependencies": {
-    "chalk": "^3.0.0",
+    "chalk": "^4.1.2",
     "edit-json-file": "^1.5.0",
     "gitignore": "^0.6.0",
     "inquirer": "^6.5.2",
     "ncp": "^2.0.0",
     "ora": "^4.0.3"
   },
-  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   },
